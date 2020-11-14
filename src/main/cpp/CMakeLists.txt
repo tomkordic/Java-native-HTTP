@@ -1,0 +1,80 @@
+cmake_minimum_required(VERSION 3.17)
+project(ffmpeg_integration)
+
+set(CMAKE_CXX_STANDARD 14)
+
+set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} )
+
+
+## First line is to link log staticly, second is to link dynamicly
+#SET(Boost_USE_STATIC_LIBS ON)
+#ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+
+find_package( avformat )
+find_package( avcodec )
+find_package( avutil )
+find_package( swscale )
+find_package( Threads )
+find_package( Java )
+find_package( Java COMPONENTS Runtime )
+find_package( Java COMPONENTS Development )
+
+if ( NOT JAVA_HOME )
+    message(CRITICAL_MESSAGE "")
+endif()
+
+
+message("Found javah at: " ${Java_JAVAC_EXECUTABLE})
+string(REGEX MATCH "(.*)bin\/javac.*" Java_root ${Java_JAVAC_EXECUTABLE})
+message("Found java root at: " ${CMAKE_MATCH_1})
+
+set(Java_INCLUDE_DIRS
+        ${CMAKE_MATCH_1}/include
+        ${CMAKE_MATCH_1}/include/linux
+)
+
+set(Java_LIBRARIES
+        ${CMAKE_MATCH_1}/lib
+)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
+
+include_directories(
+        ${Java_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/jin
+        ${Boost_INCLUDE_DIR}
+        ${AVFORMAT_INCLUDE_DIR}
+        ${AVCODEC_INCLUDE_DIR}
+        ${AVUTIL_INCLUDE_DIR}
+        ${SWSCALE_INCLUDE_DIR}
+)
+
+link_directories(
+        ${Java_LIBRARIES}
+)
+
+## TODO See how to resolve LD_LIBRARY_PATH set
+set(
+        LINK_LIBRARIES
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${AVFORMAT_LIBRARY}
+        ${AVCODEC_LIBRARY}
+        ${AVUTIL_LIBRARY}
+        ${SWSCALE_LIBRARY}
+        ${EXTRA_LIBRARIES}
+)
+
+set(
+        SRC_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/jni/jni.c
+)
+
+#add_library(ffmpeg_wrapper SHARED ${SRC_FILES})
+add_executable(ffmpeg_wrapper ${SRC_FILES})
+
+target_link_libraries(
+        ffmpeg_wrapper
+        ${LINK_LIBRARIES}
+)
