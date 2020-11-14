@@ -3,6 +3,7 @@ package com.tom.streamlabs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.thaiopensource.util.Uri;
+import com.tom.streamlabs.media.MediaDetails;
 import fi.iki.elonen.NanoFileUpload;
 import fi.iki.elonen.NanoHTTPD;
 import jnr.ffi.annotations.In;
@@ -34,21 +35,19 @@ public class SlNanoServer extends NanoHTTPD {
 
     public static final String MIME_JSON = "application/json";
 
-    static String storagePath = "./storage";
-    static String staticPath = "./static";
+    static String gStoragePath = "./storage";
+    static String gStaticPath = "./static";
 
-    private native String getFileDetailsFF(String aFilePath);
+    private native MediaDetails getFileDetailsFF(String aFilePath);
 
     public SlNanoServer(int port) throws IOException {
         super(port);
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-//        String gotFromJni = getFileDetailsFF("./storage/google_glass.ts");
-//        System.out.println("C say: " +  gotFromJni);
     }
 
     public static void main(String[] args ) throws IOException {
         // TODO do some argument parsing
-        File storageDir = new File(storagePath);
+        File storageDir = new File(gStoragePath);
         if (!storageDir.exists()) {
             storageDir.mkdirs();
         }
@@ -72,7 +71,7 @@ public class SlNanoServer extends NanoHTTPD {
     }
 
     Response listUploadedFiles(IHTTPSession session) {
-        File storageDir = new File(storagePath);
+        File storageDir = new File(gStoragePath);
         JsonObject lAvailableFiles = new JsonObject();
         JsonArray filesArray = new JsonArray();
         for (String file : storageDir.list()) {
@@ -84,22 +83,24 @@ public class SlNanoServer extends NanoHTTPD {
 
     Response showFileDetails(IHTTPSession session) {
         String lFileName = null;
-        for(String parameterName : session.getParameters().keySet()) {
-            if (parameterName.equalsIgnoreCase("filename")) {
-                lFileName = session.getParameters().get(parameterName).get(0);
-            }
-        }
-        if (lFileName == null) {
+        if (session.getUri().indexOf("file_name=") == -1) {
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_JSON, "");
         }
-        // TODO get file video and audio pproperties
-        JsonObject lAvailableFiles = new JsonObject();
-        return newFixedLengthResponse(Response.Status.OK, MIME_JSON, lAvailableFiles.toString());
+        lFileName = session.getUri().split("file_name=")[1];
+        if (lFileName.contains("&")) {
+            lFileName = lFileName.split("&")[0];
+        }
+        File lFile = new File(gStoragePath + "/" + lFileName);
+        if (!lFile.exists()) {
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_JSON, "");
+        }
+        MediaDetails lDetails = getFileDetailsFF(gStoragePath + "/" + lFileName);
+        return newFixedLengthResponse(Response.Status.OK, MIME_JSON, lDetails.toJson().toString());
     }
 
     Response fileUploadPage(IHTTPSession session) {
         try {
-            Path fileName  = Path.of(staticPath + "/" + "index.html");
+            Path fileName  = Path.of(gStaticPath + "/" + "index.html");
             return newFixedLengthResponse(Response.Status.OK, MIME_HTML, Files.readString(fileName));
         } catch (IOException e) {
             e.printStackTrace();
@@ -117,7 +118,7 @@ public class SlNanoServer extends NanoHTTPD {
                 try {
                     String fileName = file.getName();
                     byte[] fileContent = file.get();
-                    Path destination = Path.of(storagePath + "/" + fileName);
+                    Path destination = Path.of(gStoragePath + "/" + fileName);
                     Files.write(destination, fileContent);
                     uploadedCount++;
                 } catch (Exception exception) {

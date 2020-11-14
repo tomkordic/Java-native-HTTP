@@ -14,28 +14,31 @@ find_package( avformat )
 find_package( avcodec )
 find_package( avutil )
 find_package( swscale )
-find_package( Threads )
 find_package( Java )
 find_package( Java COMPONENTS Runtime )
 find_package( Java COMPONENTS Development )
-
-if ( NOT JAVA_HOME )
-    message(CRITICAL_MESSAGE "")
-endif()
 
 
 message("Found javah at: " ${Java_JAVAC_EXECUTABLE})
 string(REGEX MATCH "(.*)bin\/javac.*" Java_root ${Java_JAVAC_EXECUTABLE})
 message("Found java root at: " ${CMAKE_MATCH_1})
 
+set ( JAVA_HOME
+        ${CMAKE_MATCH_1}
+)
+
 set(Java_INCLUDE_DIRS
-        ${CMAKE_MATCH_1}/include
-        ${CMAKE_MATCH_1}/include/linux
+        ${JAVA_HOME}/include
+        ${JAVA_HOME}/include/linux
 )
 
 set(Java_LIBRARIES
-        ${CMAKE_MATCH_1}/lib
+        ${JAVA_HOME}/lib
 )
+
+if ( NOT JAVA_HOME )
+    message(FATAL_ERROR "Java not found, install Java and make suure it is added to system path !!!")
+endif()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
@@ -71,8 +74,8 @@ set(
         ${CMAKE_CURRENT_SOURCE_DIR}/jni/jni.c
 )
 
-#add_library(ffmpeg_wrapper SHARED ${SRC_FILES})
-add_executable(ffmpeg_wrapper ${SRC_FILES})
+add_library(ffmpeg_wrapper SHARED ${SRC_FILES})
+##add_executable(ffmpeg_wrapper ${SRC_FILES})
 
 target_link_libraries(
         ffmpeg_wrapper
