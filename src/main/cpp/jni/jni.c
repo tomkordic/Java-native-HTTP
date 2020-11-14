@@ -14,7 +14,13 @@ jobject createNewMediaDetails(
             JNIEnv *env,
             jstring aFilePath
 ) {
-    return createJavaObject(env, "com/tom/streamlabs/media/MediaDetails", "(Ljava/lang/String;)V", aFilePath);
+    jclass lClass = (*env)->FindClass(env, "com/tom/streamlabs/media/MediaDetails");
+    jmethodID lConstructor = (*env)->GetMethodID(env, lClass, "<init>", "(Ljava/lang/String;)V");
+    return (*env)->NewObject(
+                env,
+                lClass,
+                lConstructor,
+                aFilePath);
 }
 
 jobject createNewVideoDetails(
@@ -101,7 +107,7 @@ JNIEXPORT jobject JNICALL Java_com_tom_streamlabs_SlNanoServer_getFileDetailsFF
         if (lInputFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             lAudioStream = lInputFormatContext->streams[i];
             AVCodec *lCodec = avcodec_find_decoder(lAudioStream->codecpar->codec_id);
-            const char *lProfileName = lCodec->profiles->name;
+            const char *lProfileName = av_get_profile_name(lCodec, lCodec->id);
             const char *lCodecName = lCodec->name;
             jobject lAudioDetails = createNewAudioDetails(env,
                     lAudioStream->codecpar->sample_rate, lAudioStream->codecpar->channels,
@@ -112,7 +118,7 @@ JNIEXPORT jobject JNICALL Java_com_tom_streamlabs_SlNanoServer_getFileDetailsFF
         if (lInputFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             lVideoStream = lInputFormatContext->streams[i];
             AVCodec *lCodec = avcodec_find_decoder(lVideoStream->codecpar->codec_id);
-            const char *lProfileName = lCodec->profiles->name;
+            const char *lProfileName = av_get_profile_name(lCodec, lCodec->id);
             const char *lCodecName = lCodec->name;
             jobject lVideoDetails = createNewVideoDetails(env,
                     lVideoStream->codecpar->width, lVideoStream->codecpar->height,

@@ -3,23 +3,63 @@
 <head>
  <title> File upload page </title>
 </head>
-<body>
+<body onload="refresh_file_list()">
 <!-- HTML5 Input Form Elements -->
 <input id="fileupload" type="file" name="fileupload" />
 <button id="upload-button" onclick="uploadFile()"> Upload </button>
+<p> Avilable files: </p>
+<div id="file_list_container" style="position: absolute; width:40%; height:100%;">
+
+</div>
 
 <!-- Ajax JavaScript File Upload Logic -->
 <script>
   async function uploadFile() {
-  let formData = new FormData();
-  formData.append("file", fileupload.files[0]);
-  await fetch('/upload', {
-    method: "POST",
-    body: formData
-  });
-  alert('The file has been uploaded successfully.');
+    let formData = new FormData();
+    formData.append("file", fileupload.files[0]);
+    await fetch('/upload', {
+        method: "POST",
+        body: formData
+    });
+    alert('The file has been uploaded successfully.');
+    refresh_file_list();
   }
-  </script>
+
+  async function refresh_file_list() {
+    // Clear file list container
+    var fileListContainer = document.getElementById("file_list_container");
+    fileListContainer.innerHTML = "";
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+<!--        document.getElementById("file_list_container").innerHTML = this.responseText;-->
+        var listHtml = "<ul>";
+        var files = JSON.parse(this.response).Files;
+        for(var i = 0; i < files.length; i++) {
+          var file = files[i];
+          listHtml = listHtml + "<li onmousedown=\"showFileDetails(\'" + file.trim() + "\')\">"
+                + "<b>" + file + "</b>, Click to see media details" + "</li><br>"
+        }
+      }
+      listHtml = listHtml + "</ul>"
+      document.getElementById("file_list_container").innerHTML = listHtml;
+    };
+    xhttp.open("GET", "./list_files", true);
+    xhttp.send();
+  }
+
+  async function showFileDetails(aFileName) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+       if (this.readyState == 4 && this.status == 200) {
+          var cameraDetails = JSON.parse(this.response);
+          alert(JSON.stringify(cameraDetails, null, 2));
+       }
+    }
+    xhttp.open("GET", "./file_details?file_name=" + aFileName, true);
+    xhttp.send();
+  }
+</script>
 
 </body>
 </html>

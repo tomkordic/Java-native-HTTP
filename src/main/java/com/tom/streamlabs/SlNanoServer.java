@@ -46,13 +46,24 @@ public class SlNanoServer extends NanoHTTPD {
     }
 
     public static void main(String[] args ) throws IOException {
-        // TODO do some argument parsing
+        int port = -1;
+        if (args.length == 0) {
+            System.out.println("usage: StreamlabsHttpServer port\n");
+            exit(1);
+        }
+        try {
+            port = Integer.valueOf(args[0]);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid value for port: " + args[0] + ", must be a number !");
+            System.out.println("usage: StreamlabsHttpServer port\n");
+            exit(1);
+        }
         File storageDir = new File(gStoragePath);
         if (!storageDir.exists()) {
             storageDir.mkdirs();
         }
 
-        new SlNanoServer(9090);
+        new SlNanoServer(port);
     }
 
     @Override
@@ -83,10 +94,16 @@ public class SlNanoServer extends NanoHTTPD {
 
     Response showFileDetails(IHTTPSession session) {
         String lFileName = null;
-        if (session.getUri().indexOf("file_name=") == -1) {
+        String lLineToParse;
+        if (session.getQueryParameterString() != null && session.getQueryParameterString().length() > 0) {
+            lLineToParse = session.getQueryParameterString();
+        } else {
+            lLineToParse = session.getUri();
+        }
+        if (lLineToParse.indexOf("file_name=") == -1) {
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_JSON, "");
         }
-        lFileName = session.getUri().split("file_name=")[1];
+        lFileName = lLineToParse.split("file_name=")[1];
         if (lFileName.contains("&")) {
             lFileName = lFileName.split("&")[0];
         }
