@@ -88,6 +88,7 @@ cmake {
     buildClean=false
 //    def.FFMPEG_INCLUDE_DIRECTORY="/mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/include"
 //    def.FFMPEG_LIB_DIRECTORY="/mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/lib"
+//    def.JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64/"
 }
 
 build  {
