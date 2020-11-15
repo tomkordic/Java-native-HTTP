@@ -3,17 +3,24 @@ project(ffmpeg_integration)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} )
 
+if ( FFMPEG_INCLUDE_DIRECTORY AND FFMPEG_LIB_DIRECTORY )
+	set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} )
+	find_package( avformat )
+	find_package( avcodec )
+	find_package( avutil )
+	find_package( swscale )
+else()
+	find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h REQUIRED )
+	find_library(AVCODEC_LIBRARY avcodec REQUIRED )
+	find_path(AVFORMAT_INCLUDE_DIR libavformat/avformat.h REQUIRED )
+	find_library(AVFORMAT_LIBRARY avformat REQUIRED )
+	find_path(AVUTIL_INCLUDE_DIR libavutil/avutil.h REQUIRED )
+	find_library(AVUTIL_LIBRARY avutil REQUIRED )
+	find_path(AVDEVICE_INCLUDE_DIR libavdevice/avdevice.h REQUIRED )
+	find_library(AVDEVICE_LIBRARY avdevice REQUIRED )
+endif()
 
-## First line is to link log staticly, second is to link dynamicly
-#SET(Boost_USE_STATIC_LIBS ON)
-#ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
-
-find_package( avformat )
-find_package( avcodec )
-find_package( avutil )
-find_package( swscale )
 find_package( Java )
 find_package( Java COMPONENTS Runtime )
 find_package( Java COMPONENTS Development )

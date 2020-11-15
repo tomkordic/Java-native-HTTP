@@ -12,7 +12,7 @@ find_path( SWRESAMPLE_INCLUDE_DIR libswresample/swresample.h
         $ENV{SWRESAMPLEDIR}
         PATH_SUFFIXES include
         PATHS
-        /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/include
+        ${FFMPEG_INCLUDE_DIRECTORY}
         )
 
 message( "SWRESAMPLE_INCLUDE_DIR is ${SWRESAMPLE_INCLUDE_DIR}" )
@@ -23,7 +23,7 @@ find_library( SWRESAMPLE_LIBRARY
         $ENV{SWRESAMPLEDIR}
         PATH_SUFFIXES lib64 lib bin
         PATHS
-        /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/lib
+        ${FFMPEG_LIB_DIRECTORY}
         )
 
 message( "SWRESAMPLE_LIBRARY is ${SWRESAMPLE_LIBRARY}" )

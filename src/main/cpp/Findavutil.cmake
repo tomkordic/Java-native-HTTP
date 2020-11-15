@@ -12,7 +12,7 @@ find_path( AVUTIL_INCLUDE_DIR libavutil/avutil.h
   $ENV{AVUTILDIR}
   PATH_SUFFIXES include 
   PATHS
-  /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/include
+  ${FFMPEG_INCLUDE_DIRECTORY}
 )
 
 message( "AVUTIL_INCLUDE_DIR is ${AVUTIL_INCLUDE_DIR}" )
@@ -23,7 +23,7 @@ find_library( AVUTIL_LIBRARY
   $ENV{AVUTILDIR}
   PATH_SUFFIXES lib64 lib bin
   PATHS
-  /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/lib
+  ${FFMPEG_LIB_DIRECTORY}
 )
 
 message( "AVUTIL_LIBRARY is ${AVUTIL_LIBRARY}" )

@@ -32,7 +32,7 @@ intellij {
 application {
     mainClassName = "com.tom.streamlabs.SlNanoServer"
     applicationName = 'StreamlabsHttpServer'
-    executableDir = file("$rootDir/bin/")
+    executableDir = "./bin/"
     applicationDefaultJvmArgs = ["-Djava.library.path=./lib"]
 }
 
@@ -85,7 +85,9 @@ cmake {
     // optional build target
     buildTarget='install'
     // optional build clean. if set to true, calls cmake --build with --clean-first
-    buildClean=true
+    buildClean=false
+//    def.FFMPEG_INCLUDE_DIRECTORY="/mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/include"
+//    def.FFMPEG_LIB_DIRECTORY="/mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/lib"
 }
 
 build  {

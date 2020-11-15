@@ -12,7 +12,7 @@ find_path( SWSCALE_INCLUDE_DIR libswscale/swscale.h
         $ENV{SWSCALEDIR}
         PATH_SUFFIXES include
         PATHS
-        /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/include
+        ${FFMPEG_INCLUDE_DIRECTORY}
         )
 
 message( "SWSCALE_INCLUDE_DIR is ${SWSCALE_INCLUDE_DIR}" )
@@ -23,7 +23,7 @@ find_library( SWSCALE_LIBRARY
         $ENV{SWSCALEDIR}
         PATH_SUFFIXES lib64 lib bin
         PATHS
-        /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/lib
+        ${FFMPEG_LIB_DIRECTORY}
         )
 
 message( "SWSCALE_LIBRARY is ${SWSCALE_LIBRARY}" )

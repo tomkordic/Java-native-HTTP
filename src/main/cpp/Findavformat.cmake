@@ -12,7 +12,7 @@ find_path( AVFORMAT_INCLUDE_DIR libavformat/avformat.h
   $ENV{AVFORMATDIR}
   PATH_SUFFIXES include 
   PATHS
-  /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/include
+  ${FFMPEG_INCLUDE_DIRECTORY}
 )
 
 message( "AVFORMAT_INCLUDE_DIR is ${AVFORMAT_INCLUDE_DIR}" )
@@ -23,7 +23,7 @@ find_library( AVFORMAT_LIBRARY
   $ENV{AVFORMATDIR}
   PATH_SUFFIXES lib64 lib bin
   PATHS
-  /mnt/7fab2260-fb19-41a7-ac7c-816bab2f3b92/install/ffmpeg_build/lib
+  ${FFMPEG_LIB_DIRECTORY}
 )
 
 message( "AVFORMAT_LIBRARY is ${AVFORMAT_LIBRARY}" )
