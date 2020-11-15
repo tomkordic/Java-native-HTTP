@@ -31,7 +31,7 @@ From the project root directory, run following commands to build and run the ser
 ./gradlew build
 ./gradlew run --args="port number" --info
 ```
-If the project builds correctly and all is good the last command will hang that mmeans the server is running, visit http://your_server_ip:port_passed_as_argument To view the upload page.
+If the project builds correctly and all is good the last command will hang that means that server is running, visit http://your_server_ip:port_passed_as_argument To view the upload page.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
