@@ -21,39 +21,46 @@ else()
 	find_library(AVDEVICE_LIBRARY avdevice REQUIRED )
 endif()
 
-find_package( JNI )
-
-if ( NOT JNI_FOUND)
-	find_package( Java )
-	find_package( Java COMPONENTS Runtime )
-	find_package( Java COMPONENTS Development )
-
-	message("Found javah at: " ${Java_JAVAC_EXECUTABLE})
-	string(REGEX MATCH "(.*)bin\/javac.*" Java_root ${Java_JAVAC_EXECUTABLE})
-	message("Found java root at: " ${CMAKE_MATCH_1})
-
-	set ( JAVA_HOME
-	        ${CMAKE_MATCH_1}
-	)
-
-	set(JNI_INCLUDE_DIRS
-	        ${JAVA_HOME}/include
-	        ${JAVA_HOME}/include/linux
-	)
-
-	set(JNI_LIBRARIES
-	        ${JAVA_HOME}/lib
-	)
-else()
-    message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
-    message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
-endif()
-
-
-
+message ( STATUS "JAVA_HOME: ${JAVA_HOME}")
 if ( NOT JAVA_HOME )
-    message(FATAL_ERROR "Java not found, install Java and make suure it is added to system path !!!")
+
+    find_package( JNI )
+
+    if ( NOT JNI_FOUND)
+        message ( WARNING "JNI not found, trying alternative method")
+        find_package( Java )
+        find_package( Java COMPONENTS Runtime )
+        find_package( Java COMPONENTS Development )
+
+        message("Found javah at: " ${Java_JAVAC_EXECUTABLE})
+        string(REGEX MATCH "(.*)bin\/javac.*" Java_root ${Java_JAVAC_EXECUTABLE})
+        message("Found java root at: " ${CMAKE_MATCH_1})
+
+        set ( JAVA_HOME
+            ${CMAKE_MATCH_1}
+        )
+
+        set(JNI_INCLUDE_DIRS
+            ${JAVA_HOME}/include
+            ${JAVA_HOME}/include/linux
+        )
+
+        set(JNI_LIBRARIES
+            ${JAVA_HOME}/lib
+        )
+    else()
+        message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
+        message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
+    endif()
+else()
+    file( TO_CMAKE_PATH ${JAVA_HOME}/include JNI_INCLUDE )
+    file( TO_CMAKE_PATH ${JAVA_HOME}/include/linux JNI_INCLUDE_LINUX )
+    set ( JNI_INCLUDE_DIRS ${JNI_INCLUDE} ${JNI_INCLUDE_LINUX} )
+    file( TO_CMAKE_PATH ${JAVA_HOME}/lib JNI_LIBRARIES )
+    message ( STATUS "JNI_INCLUDE_DIRS: ${JNI_INCLUDE_DIRS}")
+    message ( STATUS "JNI_LIBRARIES: ${JNI_LIBRARIES}")
 endif()
+
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib)
